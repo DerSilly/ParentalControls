@@ -7,10 +7,17 @@ using System.Text;
 
 namespace ParentalControls.Common
 {
-    [ServiceContract]
+    [ServiceContract(SessionMode=SessionMode.Required, CallbackContract=typeof(IServiceCallback))]
     public interface ICommSvc
     {
-        [OperationContract]
+        [OperationContract(IsOneWay =true)]
         void UpdateActiveWindow(string title);
+
+    }
+
+    public interface IServiceCallback
+    {
+        [OperationContract(IsOneWay = true)]
+        void ExchangeData(string data);
     }
 }

@@ -17,6 +17,7 @@ namespace ParentalControls.Service
     public partial class ParentalControls : ServiceBase, ICommSvc
     {
         private string m_ActiveWndTitle = "";
+        private IServiceCallback callback = null;
         public ParentalControls()
         {
             InitializeComponent();
@@ -72,7 +73,8 @@ namespace ParentalControls.Service
                             Utils.log.Debug("Restzeit Wochenende:      " + Utils.RestZeit(Utils.Span.WeekEnd, uptime));
                         }
                     }
-
+                    callback.ExchangeData("test");
+                
                     Utils.log.Debug("Aktives Fenster: " + m_ActiveWndTitle);
 
                     if (!Utils.BeforeSchoolDay() && 
@@ -156,6 +158,7 @@ namespace ParentalControls.Service
 
         private void init()
         {
+            callback = OperationContext.Current.GetCallbackChannel<IServiceCallback>();
             DateTime now = DateTime.Now;
             Thread.Sleep(10000);
             ParentalControlsRegistry.SetValue("DayQuota", Properties.Settings.Default.TagesKontingent);
@@ -259,6 +262,11 @@ namespace ParentalControls.Service
             ParentalControlsRegistry.IncrementKey("WeekSum", uptime);
             if (!Utils.IsWeekDay())
                 ParentalControlsRegistry.IncrementKey("WeekEndSum", uptime);
+        }
+
+        public decimal GetTimeLeft(Utils.Span span)
+        {
+            return Utils.RestZeit(span, GetUptime());
         }
     }
 }
