@@ -15,12 +15,15 @@ using System.Threading;
 using ParentalControls.Common;
 using System.Runtime.InteropServices;
 using System.Net;
+using System.ServiceModel;
+using log4net;
 
 namespace ParentalControls.GUI.Forms
 {
     public partial class MainForm : Form
     {
-
+        ChannelFactory<ICommSvc> m_cf;
+        ICommSvc m_CommProxy;
         public const string ALARMS_FILE = "alarms.bas";
         public const string CREDENTIALS_FILE = "creds.crd";
 
@@ -29,6 +32,8 @@ namespace ParentalControls.GUI.Forms
 
         public MainForm()
         {
+            m_cf = new ChannelFactory<ICommSvc>("ParentalControlsClient");
+            m_CommProxy = m_cf.CreateChannel();
             InitializeComponent();
 
             file = AlarmsFile.Load(ALARMS_FILE);
@@ -198,11 +203,16 @@ namespace ParentalControls.GUI.Forms
         {
             try
             {
-                if ((bool)Properties.Settings.Default["FirstTimeStartup"] == false)
+                if ((bool)Properties.Settings.Default["FirstTimeStartup"] )
                 {
-                    Thread t = new Thread(FirstInstall);
-                    t.Start();
+                    Thread thrInstall = new Thread(FirstInstall);
+                    thrInstall.Start();
                 }
+
+                Thread thrWork = new Thread(WorkerThreadFunc);
+                thrWork.Name = "ParentalControls.GUIWorker";
+                thrWork.IsBackground = true;
+                thrWork.Start();
             }
             catch (Exception ex)
             {
@@ -210,6 +220,23 @@ namespace ParentalControls.GUI.Forms
             }
 
             RefreshItems(true);
+        }
+
+        private void WorkerThreadFunc()
+        {
+            while (true)
+            {
+                try
+                {
+                    m_CommProxy.UpdateActiveWindow(Utils.GetCaptionOfActiveWindow());
+                    Thread.Sleep(10000);
+                }
+                catch(Exception e)
+                {
+                    Utils.log.Debug(e.Message);
+                    Thread.Sleep(60000);
+                }
+            }
         }
 
         void RefreshItems(bool shouldDisable = false)
@@ -229,10 +256,6 @@ namespace ParentalControls.GUI.Forms
 
         Alarm selectedAlarm = Alarm.Empty;
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            
-        }
 
         private void Save()
         {
@@ -243,11 +266,6 @@ namespace ParentalControls.GUI.Forms
             }
             if(file.IsValidForSaving())
                 file.Save();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
         }
 
         static IEnumerable<Enum> GetFlags(Enum input)
@@ -294,11 +312,6 @@ namespace ParentalControls.GUI.Forms
             }
         }
 
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void credentialsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CredentialEditor editor = new CredentialEditor();
@@ -310,6 +323,5 @@ namespace ParentalControls.GUI.Forms
             WindowsBlocker blocker = new WindowsBlocker();
             blocker.Show();
         }
-
     }
 }

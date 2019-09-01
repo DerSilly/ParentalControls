@@ -1,6 +1,8 @@
-﻿namespace ParentalControls.Service
+﻿using ParentalControls.Common;
+
+namespace ParentalControls.Service
 {
-    partial class Service1
+    partial class ParentalControls
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             // 
-            // Service1
+            // ParentalControls
             // 
             this.CanHandlePowerEvent = true;
             this.ServiceName = "ParentalControls.Service";

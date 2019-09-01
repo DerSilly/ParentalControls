@@ -17,7 +17,7 @@ namespace ParentalControls.Common
 
         public bool IsValidForSaving()
         {
-            return String.IsNullOrWhiteSpace(FileName);
+            return !String.IsNullOrWhiteSpace(FileName);
         }
 
         public string FileName

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParentalControls.GUI", "ParentalControls.GUI\ParentalControls.GUI.csproj", "{8BAE11D3-D0FC-4462-A80C-F22F03FCF455}"
 EndProject
@@ -35,5 +35,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24DE6848-8D5C-40B4-82DE-532276A5B0B5} = {225D9939-7DB3-4274-AC70-DC3F627D5D49}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90735459-D056-46BE-BFD3-7EBCB278C5DE}
 	EndGlobalSection
 EndGlobal
