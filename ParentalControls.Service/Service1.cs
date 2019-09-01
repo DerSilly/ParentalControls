@@ -16,7 +16,7 @@ namespace ParentalControls.Service
 {
     public partial class ParentalControls : ServiceBase, ICommSvc
     {
-        private string m_ActiveWndTitle = "";
+        private static string m_ActiveWndTitle = "";
         public ParentalControls()
         {
             InitializeComponent();
@@ -31,7 +31,7 @@ namespace ParentalControls.Service
 
         public void UpdateActiveWindow(string title)
         {
-            this.m_ActiveWndTitle = title;
+            m_ActiveWndTitle = title;
         }
 
         Time GetCurrentTime()
