@@ -20,7 +20,7 @@ using log4net;
 
 namespace ParentalControls.GUI.Forms
 {
-    public partial class MainForm : Form
+    public partial class MainForm : Form, IServiceCallback
     {
         ChannelFactory<ICommSvc> m_cf;
         ICommSvc m_CommProxy;
@@ -322,6 +322,18 @@ namespace ParentalControls.GUI.Forms
         {
             WindowsBlocker blocker = new WindowsBlocker();
             blocker.Show();
+        }
+
+        private void TrayIcon_Click(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = true;
+            this.trayIcon.Visible = false;
+            this.WindowState = FormWindowState.Normal;
+        }
+
+        public void ExchangeData(string data)
+        {
+            Utils.log.Debug("Eschangedata:" + data);
         }
     }
 }
