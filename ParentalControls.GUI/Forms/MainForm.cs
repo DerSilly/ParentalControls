@@ -22,17 +22,17 @@ namespace ParentalControls.GUI.Forms
 {
     public partial class MainForm : Form, IServiceCallback
     {
-        ChannelFactory<ICommSvc> m_cf;
+        DuplexChannelFactory<ICommSvc> m_cf;
         ICommSvc m_CommProxy;
         public const string ALARMS_FILE = "alarms.bas";
         public const string CREDENTIALS_FILE = "creds.crd";
 
         AlarmsFile file;
         ParentalControlsCredentialsFile file2;
-
+         
         public MainForm()
         {
-            m_cf = new ChannelFactory<ICommSvc>("ParentalControlsClient");
+            m_cf = new DuplexChannelFactory<ICommSvc>(new InstanceContext(this), "ParentalControlsClient");
             m_CommProxy = m_cf.CreateChannel();
             InitializeComponent();
 
@@ -334,6 +334,7 @@ namespace ParentalControls.GUI.Forms
         public void ExchangeData(string data)
         {
             Utils.log.Debug("Eschangedata:" + data);
+            data = "callback";
         }
     }
 }

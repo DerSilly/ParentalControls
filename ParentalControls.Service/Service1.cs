@@ -14,6 +14,7 @@ using System.ServiceModel;
 
 namespace ParentalControls.Service
 {
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public partial class ParentalControls : ServiceBase, ICommSvc
     {
         private string m_ActiveWndTitle = "";
@@ -73,7 +74,8 @@ namespace ParentalControls.Service
                             Utils.log.Debug("Restzeit Wochenende:      " + Utils.RestZeit(Utils.Span.WeekEnd, uptime));
                         }
                     }
-                    callback.ExchangeData("test");
+                    string data = "";
+                    callback.ExchangeData(data);
                 
                     Utils.log.Debug("Aktives Fenster: " + m_ActiveWndTitle);
 
@@ -158,34 +160,41 @@ namespace ParentalControls.Service
 
         private void init()
         {
-            callback = OperationContext.Current.GetCallbackChannel<IServiceCallback>();
-            DateTime now = DateTime.Now;
-            Thread.Sleep(10000);
-            ParentalControlsRegistry.SetValue("DayQuota", Properties.Settings.Default.TagesKontingent);
-            ParentalControlsRegistry.SetValue("WeekQuota", Properties.Settings.Default.WochenKontingent);
-            ParentalControlsRegistry.SetValue("WeekEndQuota", Properties.Settings.Default.WochenendKontingent);
-
-            Utils.log.Debug("Diese Woche verbraucht:   " + ParentalControlsRegistry.GetValue("WeekSum"));
-            Utils.log.Debug("Heute verbraucht:         " + ParentalControlsRegistry.GetValue("DaySum"));
-            if (!Utils.IsWeekDay())
+            try
             {
-                Utils.log.Debug("Am Wochenende verbraucht: " + ParentalControlsRegistry.GetValue("WeekEndSum"));
-            }
+                DateTime now = DateTime.Now;
+                Thread.Sleep(10000);
+                ParentalControlsRegistry.SetValue("DayQuota", Properties.Settings.Default.TagesKontingent);
+                ParentalControlsRegistry.SetValue("WeekQuota", Properties.Settings.Default.WochenKontingent);
+                ParentalControlsRegistry.SetValue("WeekEndQuota", Properties.Settings.Default.WochenendKontingent);
 
-            if (Utils.FirstRunThisDay())
-            {
-                ParentalControlsRegistry.SetValue("LastStart", now);
-                ParentalControlsRegistry.SetValue("DaySum", "0,00");
-                if (now.DayOfWeek == DayOfWeek.Monday)
-                    ParentalControlsRegistry.SetValue("WeekSum", "0,00");
-                else if (now.DayOfWeek == DayOfWeek.Saturday)
-                    ParentalControlsRegistry.SetValue("WeekEndSum", "0,00");
-            }
+                Utils.log.Debug("Diese Woche verbraucht:   " + ParentalControlsRegistry.GetValue("WeekSum"));
+                Utils.log.Debug("Heute verbraucht:         " + ParentalControlsRegistry.GetValue("DaySum"));
+                if (!Utils.IsWeekDay())
+                {
+                    Utils.log.Debug("Am Wochenende verbraucht: " + ParentalControlsRegistry.GetValue("WeekEndSum"));
+                }
+
+                if (Utils.FirstRunThisDay())
+                {
+                    ParentalControlsRegistry.SetValue("LastStart", now);
+                    ParentalControlsRegistry.SetValue("DaySum", "0,00");
+                    if (now.DayOfWeek == DayOfWeek.Monday)
+                        ParentalControlsRegistry.SetValue("WeekSum", "0,00");
+                    else if (now.DayOfWeek == DayOfWeek.Saturday)
+                        ParentalControlsRegistry.SetValue("WeekEndSum", "0,00");
+                }
   
-            _thread = new Thread(WorkerThreadFunc);
-            _thread.Name = "ParentalControls.Worker";
-            _thread.IsBackground = true;
-            _thread.Start();
+                _thread = new Thread(WorkerThreadFunc);
+                _thread.Name = "ParentalControls.Worker";
+                _thread.IsBackground = true;
+                _thread.Start();
+            }
+            catch (Exception e)
+            {
+
+                Utils.log.Error(e.Message + "\n" + e.StackTrace);
+            }
 
         }
         protected override void OnContinue()
